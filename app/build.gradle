@@ -9,10 +9,10 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        externalNativeBuild {
-            cmake {
-                cppFlags ""
-            }
+        // 增量更新
+        ndk {
+            // 指定支持的cpu架构类型
+            abiFilters 'armeabi', 'armeabi-v7a', 'arm64-v8a'
         }
     }
     buildTypes {
@@ -23,7 +23,7 @@ android {
     }
     externalNativeBuild {
         cmake {
-            path "CMakeLists.txt"
+            path "src/main/cpp/CMakeLists.txt"
         }
     }
 }

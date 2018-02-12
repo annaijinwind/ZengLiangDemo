@@ -24,19 +24,23 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if 0
-__FBSDID("$FreeBSD: src/usr.bin/bsdiff/bsdiff/bsdiff.c,v 1.1 2005/08/06 01:59:05 cperciva Exp $");
-#endif
+#include "com_zengliang_demo_nativediff_DiffUtils.h"
+
+#include "../bzip2/bzlib.c"
+#include "../bzip2/crctable.c"
+#include "../bzip2/compress.c"
+#include "../bzip2/decompress.c"
+#include "../bzip2/randtable.c"
+#include "../bzip2/blocksort.c"
+#include "../bzip2/huffman.c"
 
 #include <sys/types.h>
-
 #include <err.h>
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include "bizp2/bzlib.h"
 
 #define MIN(x,y) (((x)<(y)) ? (x) : (y))
 
@@ -175,7 +179,7 @@ static off_t search(off_t *I,u_char *old,off_t oldsize,
 	};
 }
 
-static void offtout(off_t x,u_char *buf)
+static void bsdiff_main(off_t x,u_char *buf)
 {
 	off_t y;
 
@@ -193,7 +197,7 @@ static void offtout(off_t x,u_char *buf)
 	if(x<0) buf[7]|=0x80;
 }
 
-int main(int argc,char *argv[])
+int mydiff(int argc,char *argv[])
 {
 	int fd;
 	u_char *old,*new;
@@ -260,9 +264,9 @@ int main(int argc,char *argv[])
 		??	??	Bzip2ed diff block
 		??	??	Bzip2ed extra block */
 	memcpy(header,"BSDIFF40",8);
-	offtout(0, header + 8);
-	offtout(0, header + 16);
-	offtout(newsize, header + 24);
+    bsdiff_main(0, header + 8);
+    bsdiff_main(0, header + 16);
+    bsdiff_main(newsize, header + 24);
 	if (fwrite(header, 32, 1, pf) != 1)
 		err(1, "fwrite(%s)", argv[3]);
 
@@ -331,17 +335,17 @@ int main(int argc,char *argv[])
 			dblen+=lenf;
 			eblen+=(scan-lenb)-(lastscan+lenf);
 
-			offtout(lenf,buf);
+            bsdiff_main(lenf,buf);
 			BZ2_bzWrite(&bz2err, pfbz2, buf, 8);
 			if (bz2err != BZ_OK)
 				errx(1, "BZ2_bzWrite, bz2err = %d", bz2err);
 
-			offtout((scan-lenb)-(lastscan+lenf),buf);
+            bsdiff_main((scan-lenb)-(lastscan+lenf),buf);
 			BZ2_bzWrite(&bz2err, pfbz2, buf, 8);
 			if (bz2err != BZ_OK)
 				errx(1, "BZ2_bzWrite, bz2err = %d", bz2err);
 
-			offtout((pos-lenb)-(lastpos+lenf),buf);
+            bsdiff_main((pos-lenb)-(lastpos+lenf),buf);
 			BZ2_bzWrite(&bz2err, pfbz2, buf, 8);
 			if (bz2err != BZ_OK)
 				errx(1, "BZ2_bzWrite, bz2err = %d", bz2err);
@@ -358,7 +362,7 @@ int main(int argc,char *argv[])
 	/* Compute size of compressed ctrl data */
 	if ((len = ftello(pf)) == -1)
 		err(1, "ftello");
-	offtout(len-32, header + 8);
+    bsdiff_main(len-32, header + 8);
 
 	/* Write compressed diff data */
 	if ((pfbz2 = BZ2_bzWriteOpen(&bz2err, pf, 9, 0, 0)) == NULL)
@@ -373,7 +377,7 @@ int main(int argc,char *argv[])
 	/* Compute size of compressed diff data */
 	if ((newsize = ftello(pf)) == -1)
 		err(1, "ftello");
-	offtout(newsize - len, header + 16);
+    bsdiff_main(newsize - len, header + 16);
 
 	/* Write compressed extra data */
 	if ((pfbz2 = BZ2_bzWriteOpen(&bz2err, pf, 9, 0, 0)) == NULL)
