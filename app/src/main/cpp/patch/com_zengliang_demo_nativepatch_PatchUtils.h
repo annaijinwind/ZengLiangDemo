@@ -11,7 +11,7 @@ extern "C" {
  * Method:    genDiff
  * Signature: (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)I
  */
-JNIEXPORT jstring JNICALL Java_com_zengliang_demo_nativepatch_PatchUtils_getNewApk
+JNIEXPORT jint JNICALL Java_com_zengliang_demo_nativepatch_PatchUtils_getNewApk
   (JNIEnv *, jclass, jstring, jstring, jstring);
 
 

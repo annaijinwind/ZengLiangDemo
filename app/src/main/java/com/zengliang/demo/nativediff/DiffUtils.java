@@ -5,6 +5,9 @@ package com.zengliang.demo.nativediff;
  */
 
 public class DiffUtils {
+    static {
+        System.loadLibrary("diff");
+    }
     /**
      * native方法 比较路径为oldPath的apk与newPath的apk之间差异，并生成patch包，存储于patchPath
      * <p>
